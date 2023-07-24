@@ -63,3 +63,15 @@ func ball(offset: CGSize = .zero) -> some View {
                 })
         )
 ```
+
+вставим все это в view и зададим черный фон
+
+```swift
+
+var body: some View {
+        VStack {
+            singleMetaBall()
+                .preferredColorScheme(.dark)
+        }
+    }
+```
