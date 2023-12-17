@@ -9,15 +9,9 @@ import SwiftUI
 
 struct Home: View {
     @State var degrees: Bool = false
-    @State var offset: Bool = false
-    @State var timeRemaining = 0
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     var degreesAnimation: Animation {
         Animation.linear(duration: 2.5)
             .repeatForever(autoreverses: false)
-    }
-    var offsetAnimation: Animation {
-        Animation.easeInOut(duration: 2)
     }
     
     var body: some View {
@@ -25,20 +19,11 @@ struct Home: View {
             singleMetaBall()
                 .rotationEffect(.degrees(degrees ? 0 : 360))
                 .animation(degreesAnimation, value: degrees)
-                .animation(offsetAnimation, value: offset)
-                .onReceive(timer, perform: { _ in
-                    timeRemaining += 1
-                    if timeRemaining % 3 == 0 {
-                        offset.toggle()
-                    }
-                })
                 .preferredColorScheme(.dark)
                 .ignoresSafeArea()
                 .onAppear {
                     degrees.toggle()
-                    offset.toggle()
                 }
-
         }
     }
     
@@ -80,15 +65,15 @@ struct Home: View {
                 }
             }
         } symbols: {
-            ball(offset: CGSize(width: offset ? -40 : 0, height: offset ? -40 : 0))
+            BallView(offset: CGSize(width: -35, height: -35))
                 .tag(1)
-            ball(offset: CGSize(width: offset ? -35 : 0, height: offset ? 35 : 0))
+            BallView(offset: CGSize(width: -35, height: 35))
                 .tag(2)
-            ball()
+            BallView(offset: .zero)
                 .tag(3)
-            ball(offset: CGSize(width: offset ? 35 : 0, height: offset ? -35 : 0))
+            BallView(offset: CGSize(width: 35, height:-35))
                 .tag(4)
-            ball(offset: CGSize(width: offset ? 35 : 0, height: offset ? 35 : 0))
+            BallView(offset: CGSize(width: 35, height: 35))
                 .tag(5)
         }
     }
@@ -98,11 +83,34 @@ struct Home: View {
             .fill(.white)
             .frame(width: 110, height: 110)
             .offset(offset)
+            
     }
 }
 
-struct Home_Previews: PreviewProvider {
-    static var previews: some View {
-        Home()
+#Preview {
+    Home()
+}
+
+struct BallView: View {
+    @State var offsetChange: Bool = false
+    var offsetAnimation: Animation {
+        Animation.easeInOut(duration: 2.5)
+            .repeatForever(autoreverses: true)
+    }
+    var offset: CGSize
+    
+    var body: some View {
+        Circle()
+            .fill(.white)
+            .frame(width: 110, height: 110)
+            .offset(offsetChange ? offset : .zero)
+            .animation(offsetAnimation, value: offsetChange)
+            .onAppear {
+                offsetChange.toggle()
+            }
     }
 }
+#Preview(body: {
+    BallView(offset: .zero)
+        .preferredColorScheme(.dark)
+})
